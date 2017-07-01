@@ -1,6 +1,7 @@
 from scipy import stats
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 from numpy import genfromtxt, float, amax, amin
 
 
@@ -30,15 +31,16 @@ def regression(points, start, end):  # add error value calculation instead of st
 
 
 def error_estimate(points_x, points_y, m_value):
-    y_bar = np.mean(points_x)
-    x_bar = np.mean(points_y)
+    x_bar = np.mean(points_x)
+    y_bar = np.mean(points_y)
 
     sq_dev_y = 0
     sq_dev_x = 0
     for i in points_y:
-        sq_dev_y += (i - y_bar) ** 2
+        sq_dev_y += ((i - y_bar) ** 2)
+
     for i in points_x:
-        sq_dev_x += (i - x_bar) ** 2
+        sq_dev_x += ((i - x_bar) ** 2)
 
     delta_e = np.abs((sq_dev_y / sq_dev_x) - (m_value ** 2))
     err = np.sqrt(delta_e / (len(points_x) - 2))
@@ -75,7 +77,7 @@ def plot_strain_time(names, points_list, reg_values_list, start, end, color_list
     for i, name, points, reg_values in zip(range(3), names, points_list, reg_values_list):
         plt.plot(points["Time"], points["Strain"], color_list[name], label=name.replace("_", " "))
 
-        plt.text(spacing_x * 0.825, spacing_y * (0.370 - i * 0.075),
+        plt.text(spacing_x * 0.7, spacing_y * (0.370 - i * 0.075),
                  "Linear Fit Equation for {4}: \ny ={0:.4f}x {5} {3:.4f} + {1:.3f} %/s \nr = {2:.2f}".format(
                      reg_values[0],
                      reg_values[1],
@@ -103,7 +105,7 @@ def plot_strain_rate_stress(plot_info, stress):
 
     uncertainty_y = []
     for i in range(3):
-        uncertainty_y.append(plot_info[i][0] / plot_info[i][3])
+        uncertainty_y.append(plot_info[i][3] / plot_info[i][0])
 
     uncertainty_dia = 0.01 * 10 ** -3
     uncertainty_area_per = uncertainty_dia / (0.9566666 / 2)
@@ -126,8 +128,7 @@ def plot_strain_rate_stress(plot_info, stress):
 
     plt.axis([0, spacing_x, spacing_y, 0])
 
-    # plt.plot(stress, strain_rate, "ko", label="Stress vs Strain-Rate")
-    plt.errorbar(stress, strain_rate, fmt="ko", xerr=0, yerr=error, label="Stress vs Strain-Rate")
+    plt.errorbar(stress, strain_rate, fmt="ko", xerr=0, yerr=uncertainty_y, label="Stress vs Strain-Rate")
 
     plt.text(spacing_x * 0.05, spacing_y * 0.2,
              "Linear Fit Equation: \ny ={0:.4f}x {4} {3:.4f} + {1:.3f} log(%Pa/s) \nr = {2:.2f}".format(
