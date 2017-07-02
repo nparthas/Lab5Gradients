@@ -17,7 +17,8 @@ def read_format_data(filename, initial_length):
 def calculate_stress(mass, diameter):
     stress = []
     for m, d in zip(mass.values(), diameter.values()):
-        stress.append(np.log((m * 9.81) / ((d / 2) ** 2 * np.pi)))
+        stress.append(((m * 9.81) / (((d * 10 ** -3) / 2) ** 2 * np.pi)))
+
     return stress
 
 
@@ -99,6 +100,7 @@ def plot_strain_time(names, points_list, reg_values_list, start, end, color_list
 
 
 def plot_strain_rate_stress(plot_info, stress):
+    stress = np.log(stress)
     strain_rate = []
     for i in range(3):
         strain_rate.append(np.log(plot_info[i][0]))
@@ -137,9 +139,9 @@ def plot_strain_rate_stress(plot_info, stress):
                  r_value,
                  error,
                  u"\u00B1"))
-
-    np_stress = np.array([3] + stress + [4])
-    plt.plot(np_stress, f(np_stress, m_value, b_value), "k--", label="Linear Fit")
+    stress = np.insert(stress, 0, [16.7])
+    stress = np.insert(stress, stress.size, [17.7])
+    plt.plot(stress, f(stress, m_value, b_value), "k--", label="Linear Fit")
     plt.legend(loc=3, borderaxespad=0.)
 
     plt.show()
@@ -200,6 +202,7 @@ def create_graph(name):
     }
 
     stress = calculate_stress(mass, diameter)
+    print(stress)
 
     start = [3, 6, 5]
     end = [8, 14, 11]
