@@ -1,7 +1,6 @@
 from scipy import stats
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib
 from numpy import genfromtxt, float, amax, amin
 
 
