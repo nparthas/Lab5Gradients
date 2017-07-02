@@ -152,31 +152,34 @@ def plot_strain_failure(initial_length, final_length, stress):
     for ini, fin in zip(initial_length.values(), final_length.values()):
         failure_strain.append(abs(fin - ini) / ini)
 
-    x_max = amax(failure_strain)
-    y_max = amax(stress)
+    stress = [x / 10 ** 6 for x in stress]
+
+    y_max = amax(failure_strain)
+    x_max = amax(stress)
 
     spacing_x = x_max + x_max / 4
     spacing_y = y_max + y_max / 4
 
-    plt.xlabel("Strain at Failure (%) {0} 2.54E-6 )".format(u"\u00B1"))
-    plt.ylabel("Stress (Pa) {0} 9.81E-5)".format(u"\u00B1"))
+    plt.ylabel("Strain at Failure (%) {0} 2.54E-6 )".format(u"\u00B1"))
+    plt.xlabel("Stress (MPa) {0} 9.81E-11)".format(u"\u00B1"))
 
     plt.axis([0, spacing_x, 0, spacing_y])
 
-    plt.plot(failure_strain, stress, "ko", label="Failure Stress vs Failure Strain")
+    plt.plot(stress, failure_strain, "ko", label="Failure Strain vs Failure Stress")
 
-    (m_value, b_value, r_value, tt, stderr) = stats.linregress(failure_strain, stress)
-    error = error_estimate(failure_strain, stress, m_value)
+    (m_value, b_value, r_value, tt, stderr) = stats.linregress(stress, failure_strain)
+    print(m_value, b_value)
+    error = error_estimate(stress, failure_strain, m_value)
 
-    plt.text(spacing_x * 0.05, spacing_y * 0.2,
-             "Linear Fit Equation: \ny ={0:.4f}x {4} {3:.4f} + {1:.3f} log(%Pa/s) \nr = {2:.2f}".format(
+    plt.text(spacing_x * 0.05, spacing_y * 0.8,
+             "Linear Fit Equation: \ny ={0:.4f}x {4} {3:.4f} + {1:.3f} %/MPa \nr = {2:.2f}".format(
                  m_value,
                  b_value,
                  r_value,
                  error,
                  u"\u00B1"))
 
-    plt.plot(np.array(failure_strain), f(np.array(failure_strain), m_value, b_value), "k--", label="Linear Fit")
+    plt.plot(np.array([27] + stress), f(np.array([27] + stress), m_value, b_value), "k--", label="Linear Fit")
     plt.legend(loc=3, borderaxespad=0.)
 
     plt.show()
